@@ -1,0 +1,16 @@
+spring:
+  application:
+    name: user_service
+  datasource:
+    url: jdbc:postgresql://${POSTGRES_HOST:localhost}:${POSTGRES_PORT:5432}/${POSTGRES_DB:vired_user_service}
+    username: ${POSTGRES_USER:postgres}
+    password: ${POSTGRES_PASSWORD:root}
+    driver-class-name: org.postgresql.Driver
+
+  jpa:
+    hibernate:
+      ddl-auto: update
+    show-sql: true  # Shows SQL queries in the logs (optional)
+
+role-service:
+  url: ${ROLE_SERVICE_URL:http://localhost:3000}
