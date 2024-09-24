@@ -17,7 +17,7 @@ class UserServiceImpl(
 
     // Caffeine cache for users (expire entries after 10 minutes)
     private val userCache = Caffeine.newBuilder()
-        .expireAfterWrite(10, TimeUnit.MINUTES)
+        .expireAfterWrite(4, TimeUnit.HOURS)
         .maximumSize(100)
         .build<Long, User>()  // Cache user by ID
 
