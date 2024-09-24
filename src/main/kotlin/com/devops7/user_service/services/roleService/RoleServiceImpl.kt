@@ -10,13 +10,18 @@ import org.springframework.web.reactive.function.client.WebClientResponseExcepti
 class RoleServiceImpl(
     private val roleServiceWebClient: WebClient
 ) : RoleService {
+    private val rolesCache: MutableMap<String, Role> = mutableMapOf()
+
     override fun getRoleById(roleId: String): Role {
-        return try {
-            roleServiceWebClient.get()
+        return rolesCache[roleId] ?: try {
+            val role = roleServiceWebClient.get()
                 .uri("/roles/$roleId")
                 .retrieve()
                 .bodyToMono(Role::class.java)
                 .block() ?: throw RoleNotFoundException("Role with ID $roleId not found")
+
+            rolesCache[roleId] = role
+            role
         } catch (ex: WebClientResponseException.NotFound) {
             throw RoleNotFoundException("Role with ID $roleId not found")
         } catch (ex: Exception) {
