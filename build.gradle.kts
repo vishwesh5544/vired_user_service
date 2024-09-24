@@ -47,6 +47,31 @@ kotlin {
     }
 }
 
-tasks.withType<Test> {
-    useJUnitPlatform()
+//tasks.named<War>("war") {
+//    archiveFileName.set("user_service.war")  // Set the WAR file name explicitly
+////    manifest {
+////        attributes(
+////            "Manifest-Version" to "1.0",
+////            "Main-Class" to "com.devops7.user_service.UserServiceApplication",  // Replace with your main class
+////            "Start-Class" to "com.devops7.user_service.UserServiceApplication",  // For Spring Boot
+////            "Implementation-Title" to "User Service Application",
+////            "Implementation-Version" to version
+////        )
+////    }
+//
+//    manifest {
+//        attributes(
+////            "Main-Class" to "org.springframework.boot.loader.WarLauncher",  // Spring Boot WAR launcher
+//            "Main-Class" to "com.devops7.user_service.UserServiceApplicationKt",  // Spring Boot WAR launcher
+////            "Start-Class" to "com.devops7.user_service.UserServiceApplication"  // Your main application class
+//        )
+//    }
+//}
+
+tasks.withType<org.springframework.boot.gradle.tasks.bundling.BootWar> {
+    mainClass.set("com.devops7.user_service.UserServiceApplicationKt")  // Set the correct main class (replace with yours)
 }
+
+//tasks.withType<Test> {
+//    useJUnitPlatform()
+//}
