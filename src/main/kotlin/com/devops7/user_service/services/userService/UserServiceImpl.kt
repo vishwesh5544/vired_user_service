@@ -4,9 +4,10 @@ import com.devops7.user_service.exceptions.RoleNotFoundException
 import com.devops7.user_service.models.User
 import com.devops7.user_service.repository.UserRepository
 import com.devops7.user_service.services.roleService.RoleService
+import com.github.benmanes.caffeine.cache.Caffeine
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.stereotype.Service
-
+import java.util.concurrent.TimeUnit
 
 @Service
 class UserServiceImpl(
@@ -14,17 +15,27 @@ class UserServiceImpl(
     @Autowired private val roleService: RoleService
 ) : UserService {
 
+    // Caffeine cache for users (expire entries after 10 minutes)
+    private val userCache = Caffeine.newBuilder()
+        .expireAfterWrite(10, TimeUnit.MINUTES)
+        .maximumSize(100)
+        .build<Long, User>()  // Cache user by ID
+
     override fun createUser(user: User): User {
         try {
             val role = roleService.getRoleById(user.roleId!!)
-            return userRepository.save(user)
+            val createdUser = userRepository.save(user)
+            userCache.put(createdUser.id!!, createdUser)  // Cache the created user
+            return createdUser
         } catch (ex: RoleNotFoundException) {
             throw IllegalArgumentException(ex.message)
         }
     }
 
     override fun getUserById(id: Long): User? {
-        return userRepository.findById(id).orElse(null)
+        return userCache.get(id) {
+            userRepository.findById(id).orElse(null)
+        }
     }
 
     override fun getAllUsers(): List<User> {
@@ -39,11 +50,14 @@ class UserServiceImpl(
                 password = updatedUser.password ?: existingUser.password,
                 roleId = updatedUser.roleId ?: existingUser.roleId
             )
-            userRepository.save(userToUpdate)
+            val savedUser = userRepository.save(userToUpdate)
+            userCache.put(savedUser.id!!, savedUser)
+            savedUser
         }.orElse(null)
     }
 
     override fun deleteUser(id: Long) {
         userRepository.deleteById(id)
+        userCache.invalidate(id)
     }
 }
