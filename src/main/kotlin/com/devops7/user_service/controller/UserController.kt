@@ -1,6 +1,7 @@
 package com.devops7.user_service.controller
 
 import com.devops7.user_service.models.User
+import com.devops7.user_service.models.UserMappedToRole
 import com.devops7.user_service.services.userService.UserService
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.http.HttpStatus
@@ -36,7 +37,7 @@ class UserController(
     }
 
     @GetMapping("/")
-    fun getAllUsers(): ResponseEntity<List<User>> {
+    fun getAllUsers(): ResponseEntity<List<UserMappedToRole>> {
         val users = userService.getAllUsers()
         return ResponseEntity(users, HttpStatus.OK)
     }
