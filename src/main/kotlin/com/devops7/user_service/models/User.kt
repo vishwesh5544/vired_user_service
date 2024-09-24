@@ -33,3 +33,11 @@ data class User(
     @UpdateTimestamp
     var updatedAt: LocalDateTime? = null
 )
+
+data class UserMappedToRole(
+    val id: Long? = null,
+    val name: String? = null,
+    val email: String? = null,
+    val password: String? = null,
+    val roleId: Role? = null
+)
